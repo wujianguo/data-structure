@@ -2,21 +2,22 @@
 #include <string.h>
 #include "rbtree.h"
 
-REA_BLACK_TREE* new_rbtree(COMPARE_FUNC cmp_fn)
+RED_BLACK_TREE* new_rbtree(COMPARE_FUNC cmp_fn)
 {
-	REA_BLACK_TREE* p_rbtree = (REA_BLACK_TREE*)malloc(sizeof(REA_BLACK_TREE));
-	memset(p_rbtree, 0, sizeof(REA_BLACK_TREE));
+	RED_BLACK_TREE* p_rbtree = (RED_BLACK_TREE*)malloc(sizeof(RED_BLACK_TREE));
+	memset(p_rbtree, 0, sizeof(RED_BLACK_TREE));
 	p_rbtree->cmp_fn = cmp_fn;
+	return p_rbtree;
 }
 
-void delete_rbtree(REA_BLACK_TREE* p_rbtree)
+void delete_rbtree(RED_BLACK_TREE* p_rbtree)
 {
 	while(p_rbtree->size > 0)
 		rbtree_erase(p_rbtree, p_rbtree->root->key);
 	free(p_rbtree);
 }
 
-static BOOL searchBST(REA_BLACK_TREE_NODE* p_root, COMPARE_FUNC cmp_fn, KEY_TYPE key, REA_BLACK_TREE_NODE** pp_ret)
+static BOOL searchBST(RED_BLACK_TREE_NODE* p_root, COMPARE_FUNC cmp_fn, KEY_TYPE key, RED_BLACK_TREE_NODE** pp_ret)
 {
 	if(p_root == NULL)		
 	{
@@ -37,27 +38,27 @@ static BOOL searchBST(REA_BLACK_TREE_NODE* p_root, COMPARE_FUNC cmp_fn, KEY_TYPE
 	}
 }
 
-REA_BLACK_TREE_NODE* rbtree_search(REA_BLACK_TREE* p_rbtree, KEY_TYPE key)
+RED_BLACK_TREE_NODE* rbtree_search(RED_BLACK_TREE* p_rbtree, KEY_TYPE key)
 {
 	if(p_rbtree == NULL)
 		return NULL;
 	if(p_rbtree->root == NULL)
 		return NULL;
-	REA_BLACK_TREE_NODE* p_node = NULL;
+	RED_BLACK_TREE_NODE* p_node = NULL;
 	BOOL b = searchBST(p_rbtree->root, p_rbtree->cmp_fn, key, &p_node);
 	return b ? p_node : NULL;
 }
 
-static REA_BLACK_TREE_NODE* new_rbtree_node(KEY_TYPE key)
+static RED_BLACK_TREE_NODE* new_rbtree_node(KEY_TYPE key)
 {
-	REA_BLACK_TREE_NODE* p_node = NULL;
-	p_node = (REA_BLACK_TREE_NODE*)malloc(sizeof(REA_BLACK_TREE_NODE));
-	memset(p_node, 0, sizeof(REA_BLACK_TREE_NODE));
+	RED_BLACK_TREE_NODE* p_node = NULL;
+	p_node = (RED_BLACK_TREE_NODE*)malloc(sizeof(RED_BLACK_TREE_NODE));
+	memset(p_node, 0, sizeof(RED_BLACK_TREE_NODE));
 	p_node->key = key;
-	p_node = NULL;
+	return p_node;
 }
 
-static BOOL insertBST(REA_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TYPE key, REA_BLACK_TREE_NODE** pp_ret)
+static BOOL insertBST(RED_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TYPE key, RED_BLACK_TREE_NODE** pp_ret)
 {
 	if(*pp_root == NULL)
 	{
@@ -94,12 +95,12 @@ static BOOL insertBST(REA_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TY
 	}
 }
 
-static REA_BLACK_TREE_NODE* grandparent(REA_BLACK_TREE_NODE* p_node)
+static RED_BLACK_TREE_NODE* grandparent(RED_BLACK_TREE_NODE* p_node)
 {
 	return p_node->parent->parent;
 }
 
-static REA_BLACK_TREE_NODE* uncle(REA_BLACK_TREE_NODE* p_node)
+static RED_BLACK_TREE_NODE* uncle(RED_BLACK_TREE_NODE* p_node)
 {
 	if(p_node->parent == grandparent(p_node)->left)
 		return grandparent(p_node)->right;
@@ -107,19 +108,19 @@ static REA_BLACK_TREE_NODE* uncle(REA_BLACK_TREE_NODE* p_node)
 		return grandparent(p_node)->left;
 }
 
-static void color_rbtree_case1(REA_BLACK_TREE_NODE* p_node)
+static void color_rbtree_case1(RED_BLACK_TREE_NODE* p_node)
 {
 	p_node->color = BLACK;
 }
 
-static void color_rbtree_case2(REA_BLACK_TREE_NODE* p_node)
+static void color_rbtree_case2(RED_BLACK_TREE_NODE* p_node)
 {
 	p_node->color = RED;
 }
 
-static void rotate_left(REA_BLACK_TREE_NODE* p_node)
+static void rotate_left(RED_BLACK_TREE_NODE* p_node)
 {
-	REA_BLACK_TREE_NODE* p_grand = grandparent(p_node);
+	RED_BLACK_TREE_NODE* p_grand = grandparent(p_node);
 
 	p_grand->left = p_node;
 
@@ -132,9 +133,9 @@ static void rotate_left(REA_BLACK_TREE_NODE* p_node)
 	p_node->parent = p_grand;
 }
 
-static void rotate_right(REA_BLACK_TREE_NODE* p_node)
+static void rotate_right(RED_BLACK_TREE_NODE* p_node)
 {
-	REA_BLACK_TREE_NODE* p_grand = grandparent(p_node);
+	RED_BLACK_TREE_NODE* p_grand = grandparent(p_node);
 
 	p_grand->right = p_node;
 
@@ -147,7 +148,7 @@ static void rotate_right(REA_BLACK_TREE_NODE* p_node)
 	p_node->parent = p_grand;
 }
 
-static void color_rbtree(REA_BLACK_TREE_NODE* p_node)
+static void color_rbtree(RED_BLACK_TREE_NODE* p_node)
 {
 	if(p_node->parent == NULL)
 		p_node->color = BLACK;
@@ -181,9 +182,9 @@ static void color_rbtree(REA_BLACK_TREE_NODE* p_node)
 	}
 }
 
-REA_BLACK_TREE_NODE* rbtree_insert(REA_BLACK_TREE* p_rbtree, KEY_TYPE key, void* data)
+RED_BLACK_TREE_NODE* rbtree_insert(RED_BLACK_TREE* p_rbtree, KEY_TYPE key, void* data)
 {
-	REA_BLACK_TREE_NODE* p_node = NULL;
+	RED_BLACK_TREE_NODE* p_node = NULL;
 	BOOL b = insertBST(&p_rbtree->root, p_rbtree->cmp_fn, key, &p_node);
 	p_node->data = data;
 	if(b)
@@ -194,7 +195,7 @@ REA_BLACK_TREE_NODE* rbtree_insert(REA_BLACK_TREE* p_rbtree, KEY_TYPE key, void*
 	return p_node;
 }
 
-static void eraseBST_ex(REA_BLACK_TREE_NODE** pp_node)
+static void eraseBST_ex(RED_BLACK_TREE_NODE** pp_node)
 {
 	if((*pp_node)->left == NULL && (*pp_node)->right == NULL)
 	{
@@ -203,7 +204,7 @@ static void eraseBST_ex(REA_BLACK_TREE_NODE** pp_node)
 	}
 	else if((*pp_node)->left == NULL)
 	{
-		REA_BLACK_TREE_NODE* right = (*pp_node)->right;
+		RED_BLACK_TREE_NODE* right = (*pp_node)->right;
 		if(right)
 			right->parent = (*pp_node)->parent;
 		free(*pp_node);
@@ -211,7 +212,7 @@ static void eraseBST_ex(REA_BLACK_TREE_NODE** pp_node)
 	}
 	else if((*pp_node)->right == NULL)
 	{
-		REA_BLACK_TREE_NODE* left = (*pp_node)->left;
+		RED_BLACK_TREE_NODE* left = (*pp_node)->left;
 		if(left)
 			left->parent = (*pp_node)->parent;
 		free(*pp_node);
@@ -219,12 +220,12 @@ static void eraseBST_ex(REA_BLACK_TREE_NODE** pp_node)
 	}
 	else
 	{
-		REA_BLACK_TREE_NODE** pp_right = &(*pp_node)->right;
+		RED_BLACK_TREE_NODE** pp_right = &(*pp_node)->right;
 		while((*pp_right)->left != NULL)
 			pp_right = &(*pp_right)->left;
 		(*pp_node)->key = (*pp_right)->key;
 		(*pp_node)->data = (*pp_right)->data;
-		REA_BLACK_TREE_NODE* right = (*pp_right)->right;
+		RED_BLACK_TREE_NODE* right = (*pp_right)->right;
 		if(right)
 			right->parent = (*pp_right)->parent;
 		free(*pp_right);
@@ -232,7 +233,7 @@ static void eraseBST_ex(REA_BLACK_TREE_NODE** pp_node)
 	}
 }
 
-static BOOL eraseBST(REA_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TYPE key)
+static BOOL eraseBST(RED_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TYPE key)
 {
 	if(*pp_root == NULL)
 	{
@@ -253,19 +254,56 @@ static BOOL eraseBST(REA_BLACK_TREE_NODE** pp_root, COMPARE_FUNC cmp_fn, KEY_TYP
 	}
 }
 
-void rbtree_erase(REA_BLACK_TREE* p_rbtree, KEY_TYPE key)
+void rbtree_erase(RED_BLACK_TREE* p_rbtree, KEY_TYPE key)
 {
 	BOOL b = eraseBST(&p_rbtree->root, p_rbtree->cmp_fn, key);
 	if(b)
 		p_rbtree->size--;
 }
 
-void dump_rbtree_to_file(REA_BLACK_TREE* p_rbtree, const char* file_path, DATA_TO_STRING_FUNC to_string)
+void dump_rbtree_to_file(RED_BLACK_TREE* p_rbtree, const char* file_path, DATA_TO_STRING_FUNC to_string)
 {
 
 }
 
-REA_BLACK_TREE* load_rbtree_from_file(const char* file_path, STRING_TO_DATA_FUNC to_data)
+RED_BLACK_TREE* load_rbtree_from_file(const char* file_path, STRING_TO_DATA_FUNC to_data)
 {
 
+}
+
+RED_BLACK_TREE_NODE* rbtree_midorder_begin(RED_BLACK_TREE* p_rbtree)
+{
+	RED_BLACK_TREE_NODE* p_cur_node = p_rbtree->root;
+	while(p_cur_node->left)
+		p_cur_node = p_cur_node->left;
+	return p_cur_node;
+}
+
+RED_BLACK_TREE_NODE* rbtree_midorder_pre(RED_BLACK_TREE* p_rbtree, RED_BLACK_TREE_NODE* p_node)
+{
+
+}
+
+RED_BLACK_TREE_NODE* rbtree_midorder_next(RED_BLACK_TREE* p_rbtree, RED_BLACK_TREE_NODE* p_node)
+{
+	if(p_rbtree==NULL || p_rbtree->root==NULL || p_node==NULL)
+		return NULL;
+
+	if(p_node->right)
+	{
+		RED_BLACK_TREE_NODE* p_cur_node = p_node->right;
+		while(p_cur_node->left)
+			p_cur_node = p_cur_node->left;
+		return p_cur_node;
+	}
+	else
+	{
+		RED_BLACK_TREE_NODE* p_parent = p_node->parent;
+		while(p_parent!=NULL && p_parent->right==p_node)
+		{
+			p_node = p_parent;
+			p_parent = p_parent->parent;
+		}
+		return p_parent;
+	}
 }
